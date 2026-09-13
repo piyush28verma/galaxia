@@ -1,9 +1,9 @@
-import { executeGalaxiaTurn, getGrantMatrix } from "./kernel.mjs";
+import { executeAuditTurn, getGrantMatrix } from "./kernel.mjs";
 import { getPublicKey, verifySignature } from "./crypto-signatures.mjs";
 import { scanPromptInjection, computeDeterministicScore } from "./static-analyzer.mjs";
 
 console.log("================================================================");
-console.log("     GALAXIA — 4 KILLER FEATURES VERIFICATION SUITE            ");
+console.log("     CODELENS AI — 4 KILLER FEATURES VERIFICATION SUITE         ");
 console.log("================================================================\n");
 
 async function testAllKillerFeatures() {
@@ -16,8 +16,8 @@ async function testAllKillerFeatures() {
   console.log("  • Adversarial Injection Result:", maliciousScan.riskLevel, "(Action:", maliciousScan.shieldAction, ")");
   console.log("  • Flagged Patterns:", maliciousScan.flaggedPatterns);
 
-  // 2. Dual-Pipeline Scoring (Deterministic + AI)
-  console.log("\n📊 [FEATURE 2] Testing Dual-Pipeline Deterministic Scoring...");
+  // 2. Dual-Engine Scoring (Deterministic + AI)
+  console.log("\n📊 [FEATURE 2] Testing Dual-Engine Deterministic Scoring...");
   const sqliCode = "query = f'SELECT * FROM users WHERE id = {user_input}'";
   const analysis = computeDeterministicScore(sqliCode, "security");
   console.log("  • SQLi Vulnerable Code Deterministic Score:", `${analysis.deterministicScore}/100`);
@@ -40,9 +40,9 @@ def divide(a: float, b: float) -> float:
   const pubkey = getPublicKey();
   console.log("  • Ed25519 Public Key Loaded (Length:", pubkey.length, "bytes)");
 
-  const auditTurn = await executeGalaxiaTurn({
+  const auditTurn = await executeAuditTurn({
     caller: "agent:arena-judge",
-    input: cleanCode,
+    code: cleanCode,
     mode: "review"
   });
 

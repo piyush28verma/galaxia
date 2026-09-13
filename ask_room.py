@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_URL = os.getenv("BASE_URL", "https://www.sharednet.ai").rstrip("/")
-ROOM_ID = os.getenv("ROOM_ID", "")
-INVITE_TOKEN = os.getenv("INVITE_TOKEN", "")
+ROOM_ID = os.getenv("ROOM_ID", "rom_TxTzqEUKyx")
+INVITE_TOKEN = os.getenv("INVITE_TOKEN", "rit_uAS3KksNuAyrdNC6u4niCTKeNQMXjp2IpPTZGVe4KUU")
 TOKEN_FILE = ".member_token"
 
 def get_token():

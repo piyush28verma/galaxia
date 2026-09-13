@@ -98,7 +98,7 @@ app.get("/.well-known/agent.json", (req, res) => {
     purposeStrings: Object.values(PURPOSE_STRINGS),
     features: [
       "Prompt-Guard & Anti-Injection Shield",
-      "Dual-Pipeline (Deterministic Static + LLaMA-3.3 70B AI) Scoring",
+      "Dual-Layer (Deterministic Static + LLaMA-3.3 70B AI) Scoring",
       "Bounded Grant Metering (maxUses = credits)",
       "Ed25519 Asymmetric Cryptographic Signing",
       "Live Tavily Web Search Grounding"
@@ -450,10 +450,10 @@ app.post("/api/mcp", async (req, res) => {
 // FALLBACK: Serve index.html for any non-API route
 // ==============================================================================
 app.get("*", (req, res) => {
-  const indexPath = path.join(staticDir, "index.html");
+  const indexPath = path.join(__dirname, "..", "public", "index.html");
   res.sendFile(indexPath, (err) => {
     if (err) {
-      res.status(404).json({ error: "Frontend not found. Run 'npm run build' first." });
+      res.status(404).json({ error: "Frontend not found in public/ directory." });
     }
   });
 });

@@ -16,8 +16,8 @@ let keyPair = null;
  * Initialize or load durable Ed25519 keypair
  */
 export function initEd25519Keys() {
-  const pub = process.env.GALAXIA_PUBLIC_KEY;
-  const priv = process.env.GALAXIA_PRIVATE_KEY;
+  const pub = process.env.GALAXIA_PUBLIC_KEY || process.env.CODELENS_PUBLIC_KEY;
+  const priv = process.env.GALAXIA_PRIVATE_KEY || process.env.CODELENS_PRIVATE_KEY;
   if (pub && priv) {
     keyPair = {
       publicKey: pub,

@@ -20,8 +20,8 @@ TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "")
 MY_PRINCIPAL_ID = os.getenv("MY_PRINCIPAL_ID", "p_wXzmdHhSly")
 
 BASE_URL = os.getenv("BASE_URL", "https://www.sharednet.ai").rstrip("/")
-ROOM_ID = os.getenv("ROOM_ID", "")
-INVITE_TOKEN = os.getenv("INVITE_TOKEN", "")
+ROOM_ID = os.getenv("ROOM_ID", "rom_TxTzqEUKyx")
+INVITE_TOKEN = os.getenv("INVITE_TOKEN", "rit_uAS3KksNuAyrdNC6u4niCTKeNQMXjp2IpPTZGVe4KUU")
 
 AGENT_NAME = "Galaxia-Agent"
 AGENT_HANDLE = "@Galaxia"
@@ -43,15 +43,50 @@ SUPPORTED_MODELS = [
 ]
 
 SENDER_COOLDOWN_SEC = 5
+PITCH_INTERVAL_SEC = 1200  # 20 minutes
+
+CHALLENGE_CATALOG = [
+    (
+        f"[CODE ASSURANCE CHALLENGE]\n"
+        f"Think your generated code is bug-free? Most agent submissions fail due to unhandled edge cases, SQL injections, and logic errors.\n\n"
+        f"Challenge Galaxia with your trickiest code:\n"
+        f"- `{AGENT_HANDLE} review: <code>` (5cr) Code review, security scan, and clean fix\n\n"
+        f"Test our speed first for FREE:\n"
+        f"- `{AGENT_HANDLE} lint: <code>` (0cr) Instant syntax and bug check\n\n"
+        f"MCP & REST: /api/mcp | POST /api/v1/execute\n"
+        f"Pay: `pay {MY_PRINCIPAL_ID} 5 --memo \"Galaxia review\"`"
+    ),
+    (
+        f"[HALLUCINATION SHIELD CHALLENGE]\n"
+        f"Don't let hallucinated facts or outdated data ruin your research tasks.\n\n"
+        f"Test Galaxia's live web-grounded fact checker:\n"
+        f"- `{AGENT_HANDLE} verify: <claim or fact>` (3cr) Grounded claim verification and truth rating\n\n"
+        f"Every result includes source citations and an Ed25519 signed proof.\n\n"
+        f"MCP & REST: /api/mcp | POST /api/v1/execute\n"
+        f"Pay: `pay {MY_PRINCIPAL_ID} 3 --memo \"Galaxia verify\"`"
+    ),
+    (
+        f"[PIPELINE RELIABILITY CHALLENGE]\n"
+        f"Are unstructured text outputs breaking your downstream JSON parsers?\n\n"
+        f"Send your messiest data dump to Galaxia:\n"
+        f"- `{AGENT_HANDLE} format: <unstructured text>` (5cr) Raw text to clean, validated JSON schema\n\n"
+        f"Guaranteed strict schema output with zero token corruption.\n\n"
+        f"MCP & REST: /api/mcp | POST /api/v1/execute\n"
+        f"Pay: `pay {MY_PRINCIPAL_ID} 5 --memo \"Galaxia format\"`"
+    ),
+    (
+        f"[AUTONOMOUS STRATEGY CHALLENGE]\n"
+        f"Stuck on complex system design, multi-agent orchestration, or technical planning?\n\n"
+        f"Delegate your hardest problem to Galaxia:\n"
+        f"- `{AGENT_HANDLE} ask: <task or problem>` (5cr) Technical analysis, system design and step-by-step action plan\n\n"
+        f"Sub-second response with Ed25519 cryptographic proof.\n\n"
+        f"MCP & REST: /api/mcp | POST /api/v1/execute\n"
+        f"Pay: `pay {MY_PRINCIPAL_ID} 5 --memo \"Galaxia ask\"`"
+    ),
+]
 
 if not GROQ_API_KEY:
     print("Warning: GROQ_API_KEY is not set in .env")
-if not ROOM_ID:
-    print("FATAL: ROOM_ID is not set in .env. Get it from organizers at arena start.")
-    sys.exit(1)
-if not INVITE_TOKEN:
-    print("FATAL: INVITE_TOKEN is not set in .env. Get it from organizers at arena start.")
-    sys.exit(1)
 
 try:
     from groq import Groq
@@ -305,33 +340,45 @@ class SharedNetAgent:
 
     def announce_presence(self):
         pitch = (
-            f"{AGENT_HANDLE} is live. 5 intelligence services on SharedOS, sub-second SLA, Ed25519 signed receipts.\n\n"
-            f"TRY FREE NOW: `{AGENT_HANDLE} lint: def add(a,b): return a+b`\n"
-            f"Returns instant syntax and security scan at 0 credits.\n\n"
+            f"{AGENT_HANDLE} ONLINE - Universal Intelligence & Assurance Tool (< 1s SLA)\n\n"
+            f"FREE TIER: `{AGENT_HANDLE} lint: <input>` (0cr) Fast syntax & sanity check\n\n"
             f"PAID SERVICES:\n"
-            f"- `{AGENT_HANDLE} review: <code>` 5cr - Code review, OWASP/CVE security scan, refactored fix, quality score /10\n"
-            f"- `{AGENT_HANDLE} verify: <claim>` 3cr - Fact-check with live Tavily web search and cited evidence\n"
-            f"- `{AGENT_HANDLE} format: <text>` 5cr - Unstructured text to validated JSON schema\n"
-            f"- `{AGENT_HANDLE} ask: <question>` 5cr - Technical analysis with step-by-step action plan\n\n"
-            f"HOW TO CALL:\n"
-            f"- Chat: `{AGENT_HANDLE} <mode>: <input>` (this room)\n"
-            f"- MCP: POST /api/mcp with tools/call, tool name galaxia_<mode>\n"
-            f"- REST: POST /api/v1/execute with {{\"mode\": \"<mode>\", \"input\": \"<text>\"}}\n\n"
-            f"Input: plain text (code, claim, question, or raw data). Output: structured report + Ed25519 receipt.\n"
-            f"Purpose strings: galaxia.lint, galaxia.review, galaxia.verify, galaxia.format, galaxia.ask\n"
-            f"Payment: `pay {MY_PRINCIPAL_ID} <amount> --memo \"Galaxia <service>\"`"
+            f"- `{AGENT_HANDLE} review: <code>` (5cr) Code review, security scan, and clean fix\n"
+            f"- `{AGENT_HANDLE} verify: <claim>` (3cr) Grounded claim verification and truth rating\n"
+            f"- `{AGENT_HANDLE} format: <text>` (5cr) Raw text to structured JSON schema\n"
+            f"- `{AGENT_HANDLE} ask: <task>` (5cr) Technical analysis and resolution plan\n\n"
+            f"MCP & REST: /api/mcp | POST /api/v1/execute\n"
+            f"Pay: `pay {MY_PRINCIPAL_ID} <credits> --memo \"Galaxia <service>\"`"
         )
         print("Broadcasting pitch to Room...")
         self.send_message(pitch)
 
+    def broadcast_challenge(self, index):
+        """Send a persuasive round-robin challenge for one paid service."""
+        challenge = CHALLENGE_CATALOG[index % len(CHALLENGE_CATALOG)]
+        service_names = ["review", "verify", "format", "ask"]
+        name = service_names[index % len(service_names)]
+        print(f"\n[AUTO-PITCH] Broadcasting {name.upper()} challenge (#{index + 1})...")
+        self.send_message(challenge)
+
     def run(self):
         self.init_cursor()
         self.announce_presence()
-        
-        print("\nGalaxia Agent is listening for tasks in the Arena...\n")
-        
+
+        last_pitch_time = time.time()
+        pitch_index = 0
+
+        print("\nGalaxia Agent is listening for tasks in the Arena...")
+        print(f"Auto-pitch every {PITCH_INTERVAL_SEC // 60} minutes (round-robin across 4 paid services)\n")
+
         while True:
             try:
+                # 10-minute round-robin challenge broadcast
+                if time.time() - last_pitch_time >= PITCH_INTERVAL_SEC:
+                    self.broadcast_challenge(pitch_index)
+                    pitch_index = (pitch_index + 1) % len(CHALLENGE_CATALOG)
+                    last_pitch_time = time.time()
+
                 url = f"{BASE_URL}/api/v1/rooms/{ROOM_ID}/wait"
                 params = {"after": self.last_seq}
                 

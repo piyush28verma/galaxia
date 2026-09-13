@@ -12,7 +12,7 @@ if sys.platform == "win32":
 load_dotenv()
 
 BASE_URL = os.getenv("BASE_URL", "https://www.sharednet.ai").rstrip("/")
-ROOM_ID = os.getenv("ROOM_ID", "")
+ROOM_ID = os.getenv("ROOM_ID", "rom_TxTzqEUKyx")
 TOKEN_FILE = ".member_token"
 
 def read_latest():

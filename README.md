@@ -10,7 +10,7 @@
 In an open multi-agent economy, autonomous agents face three critical failure modes:
 1. **The Freeloader Problem**: Unmetered bots exhaust LLM token budgets without paying or authorization.
 2. **Hallucination & Unverifiable Consensus**: Calling agents receive unverified claims with zero cryptographic audit trail or proof of provenance.
-3. **Execution Latency Spikes**: Multi-agent directed acyclic graphs (DAGs) fail when agents take 4-8 seconds to respond, triggering timeout cascading.
+3. **Execution Latency Spikes**: Multi-agent directed acyclic graphs (DAGs) fail when agents take 4–8 seconds to respond, triggering timeout cascading.
 
 **Galaxia solves this by treating Permissions as the Payment Primitive.**
 
@@ -44,9 +44,9 @@ Galaxia is a deterministic, high-throughput intelligence gateway that exposes AS
                    |                                  |
                    v                                  v
 +------------------------------------+ +----------------------------------+
-|      DUAL-PIPELINE INTELLIGENCE    | |    CRYPTOGRAPHIC PROVENANCE      |
-|  1. Deterministic Static AST Tool  | |  - Ed25519 Digital Signatures    |
-|  2. Groq LPU Inference (< 1.0s)   | |  - Canonical JSON Hashing        |
+|      DUAL-LAYER INTELLIGENCE      | |    CRYPTOGRAPHIC PROVENANCE      |
+|  1. Deterministic Static AST Engine| |  - Ed25519 Digital Signatures    |
+|  2. Groq LPU Inference (< 1.0s)    | |  - Canonical JSON Hashing        |
 |  3. Live Tavily Web Search Grounding| |  - Detached Receipt Attestation  |
 +------------------------------------+ +----------------------------------+
 ```
@@ -57,9 +57,9 @@ Galaxia implements the official SharedOS `CapabilityAuthorizer`. Rather than rel
 - Each grant enforces resource path boundaries, allowed actions, purpose strings, and remaining invocation limits (`maxUses`).
 - When a grant budget reaches `0`, access is revoked deterministically before consuming costly model tokens.
 
-### Pillar B: Dual-Pipeline Verification
-- **Pipeline 1 (Deterministic Static AST)**: Analyzes code structure, syntax errors, dangerous SQL/eval calls, and complexity metrics in under 5ms.
-- **Pipeline 2 (Groq LPU AI Inference)**: Executes deep semantic reasoning, OWASP vulnerability classification, grounded claim extraction, and refactored code fixes in ~400ms.
+### Pillar B: Dual-Layer Verification
+- **Layer 1 (Deterministic Static AST)**: Analyzes code structure, syntax errors, dangerous SQL/eval calls, and complexity metrics in under 5ms.
+- **Layer 2 (Groq LPU AI Inference)**: Executes deep semantic reasoning, OWASP vulnerability classification, grounded claim extraction, and refactored code fixes in ~400ms.
 
 ### Pillar C: Ed25519 Cryptographic Provenance
 Every execution returns a detached digital signature over the canonical JSON receipt. Calling agents can independently verify that:
@@ -140,8 +140,8 @@ Galaxia provides an offline-verifiable signature schema using standard Ed25519 c
 ```
 
 ### Verification Endpoints:
-- `GET /api/pubkey` - Retrieves Galaxia's SPKI PEM public key.
-- `POST /api/verify` - Verifies detached signatures against arbitrary receipt dockets.
+- `GET /api/pubkey` &rarr; Retrieves Galaxia's SPKI PEM public key.
+- `POST /api/verify` &rarr; Verifies detached signatures against arbitrary receipt dockets.
 
 ---
 
@@ -154,8 +154,8 @@ Galaxia provides an offline-verifiable signature schema using standard Ed25519 c
 ### 1. Installation
 ```bash
 # Clone the repository
-git clone https://github.com/piyush28verma/galaxia.git
-cd galaxia
+git clone https://github.com/piyush28verma/codelens-arena.git
+cd codelens-arena
 
 # Install dependencies
 npm install
@@ -167,9 +167,9 @@ Create a `.env` file in the project root:
 ```env
 GROQ_API_KEY=gsk_your_groq_api_key_here
 TAVILY_API_KEY=tvly_your_tavily_key_here
-MY_PRINCIPAL_ID=p_your_principal_id_here
-ROOM_ID=rom_your_room_id_here
-INVITE_TOKEN=rit_your_invite_token_here
+MY_PRINCIPAL_ID=p_wXzmdHhSly
+ROOM_ID=rom_TxTzqEUKyx
+INVITE_TOKEN=rit_uAS3KksNuAyrdNC6u4niCTKeNQMXjp2IpPTZGVe4KUU
 BASE_URL=https://www.sharednet.ai
 ```
 
@@ -187,7 +187,7 @@ python3 agent_bot.py
 
 ### 4. Running Test Suites
 ```bash
-# End-to-End Architectural Test Suite
+# End-to-End Architectural Test Suite (15 Test Cases)
 npm run test:e2e
 
 # Offline Standalone Verification Battery
@@ -199,19 +199,21 @@ python3 test_offline.py
 ## 7. Project Structure
 
 ```
-galaxia/
+codelens-arena/
 ├── server/
 │   ├── index.mjs             # Express REST API, SSE Starlight Stream & Static Server
 │   ├── kernel.mjs            # SharedOS CapabilityAuthorizer & Bounded Grant Matrix
-│   ├── groq-engine.mjs       # Sub-second LPU Inference & Tavily Grounding
+│   ├── groq-engine.mjs       # Sub-second LPU Inference & Tavily Grounding Engine
 │   ├── static-analyzer.mjs   # Deterministic AST Syntax & Security Analyzer
 │   ├── crypto-signatures.mjs # Asymmetric Ed25519 Keypair & Signature Verifier
-│   └── e2e-test.mjs          # Comprehensive End-to-End Test Suite
+│   └── e2e-test.mjs          # Comprehensive 15-point End-to-End Test Suite
 ├── src/
 │   ├── App.tsx               # React 18 + TypeScript + Lucide Dashboard Component
 │   ├── main.tsx              # React Root Mount
 │   └── index.css             # Theme Tokens & Starlight Glassmorphism Styles
-├── dist/                     # Vite production build output
+├── public/
+│   ├── index.html            # Standalone Production SPA
+│   └── vendor/               # Offline-resilient React & Tailwind Vendor Bundles
 ├── agent_bot.py              # Autonomous SharedNet Arena Daemon
 ├── arena_tournament.py       # Automated Multi-Agent Tournament & Trading Daemon
 ├── agent.json                # Standard A2A Metadata & Capability Descriptor
