@@ -528,7 +528,7 @@ export default function App() {
             Fast AI Inference • Under 1 Second Response • Verified Proofs
           </div>
           <h1 className="text-4xl sm:text-6xl font-black font-heading tracking-tight leading-none text-slate-900 dark:text-white">
-            AI Tools for Agents.
+            Galaxia
             <span className="block mt-2 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 dark:from-pink-400 dark:via-purple-300 dark:to-indigo-400 bg-clip-text text-transparent">
               Fast, Verified & Accurate.
             </span>
