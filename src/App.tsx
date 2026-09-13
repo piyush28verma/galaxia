@@ -116,10 +116,10 @@ function ScoreGauge({ score, nightMode }: ScoreGaugeProps) {
   const circumference = 2 * Math.PI * 40;
   const strokeDashoffset = circumference - (safeScore / 100) * circumference;
 
-  let strokeColor = "#ec4899";
-  if (safeScore >= 85) strokeColor = "#10b981";
-  else if (safeScore >= 60) strokeColor = "#6366f1";
-  else if (safeScore > 0) strokeColor = "#f59e0b";
+  let strokeColor = "#ef4444"; // Red for low score (< 50)
+  if (safeScore >= 80) strokeColor = "#10b981"; // Emerald green
+  else if (safeScore >= 60) strokeColor = "#6366f1"; // Indigo
+  else if (safeScore >= 40) strokeColor = "#f59e0b"; // Amber
 
   const circleBg = nightMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
 
@@ -525,7 +525,7 @@ export default function App() {
         <section className="text-center max-w-3xl mx-auto pt-6 space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-500/10 dark:bg-pink-500/20 border border-pink-500/30 text-pink-600 dark:text-pink-300 text-xs font-bold tracking-wide shadow-sm">
             <Zap className="w-3.5 h-3.5 text-pink-500" />
-            Fast AI Inference • Under 1 Second Response • Verified Proofs
+            Ultra-Fast Inference • Sub-Second to Real-Time • Verified Proofs
           </div>
           <h1 className="text-4xl sm:text-6xl font-black font-heading tracking-tight leading-none text-slate-900 dark:text-white">
             Galaxia
@@ -677,65 +677,99 @@ export default function App() {
                       <p className="text-sm font-medium">Select a service above and click Run to test it live.</p>
                     </div>
                   ) : (
-                    <div className="space-y-5">
-                      <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-galaxy-900/90 border border-slate-200 dark:border-white/5">
-                        <ScoreGauge score={executionResult.score ?? executionResult.deterministic_score ?? 85} nightMode={nightMode} />
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-400">Quality Assessment</span>
-                          <h4 className="text-base font-bold font-heading text-slate-900 dark:text-white">
-                            {(executionResult.score ?? 85) >= 80 ? 'Passed Quality & Security Checks' : 'Noticeable Vulnerabilities or Issues Found'}
-                          </h4>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">
-                            Processed via Groq Engine • Model: {executionResult.modelUsed || 'LLaMA-3.3-70B-Versatile'}
-                          </p>
-                        </div>
-                      </div>
+                    (() => {
+                      const outputText = String(executionResult.output || executionResult.result || executionResult.response || '');
+                      
+                      // Dynamically parse any score or status given by the LLM
+                      let dynamicScore = executionResult.score ?? executionResult.deterministic_score;
+                      const scoreOutOf10Match = outputText.match(/Score:\s*(\d+(?:\.\d+)?)\s*\/\s*10\b/i);
+                      const scoreOutOf100Match = outputText.match(/Score:\s*(\d+(?:\.\d+)?)\s*(?:\/\s*100|%)\b/i);
+                      const ratingMatch = outputText.match(/(?:Quality|Security|Confidence|Code)\s*Rating:\s*(\d+(?:\.\d+)?)\s*\/\s*10\b/i);
+                      const statusMatch = outputText.match(/Status:\s*(PASS|WARN|WARNING|FAIL)\b/i);
+                      const verdictMatch = outputText.match(/Verdict:\s*(SUPPORTED|CONTRADICTED|UNVERIFIED)\b/i);
 
-                      <div className="max-h-96 overflow-y-auto pr-2">
-                        <FormattedOutput
-                          content={executionResult.output || executionResult.result || executionResult.response || JSON.stringify(executionResult, null, 2)}
-                          onCopy={copyToClipboard}
-                        />
-                      </div>
+                      if (scoreOutOf10Match) {
+                        dynamicScore = Math.round(parseFloat(scoreOutOf10Match[1]) * 10);
+                      } else if (scoreOutOf100Match) {
+                        dynamicScore = Math.round(parseFloat(scoreOutOf100Match[1]));
+                      } else if (ratingMatch) {
+                        dynamicScore = Math.round(parseFloat(ratingMatch[1]) * 10);
+                      } else if (statusMatch) {
+                        const statusVal = statusMatch[1].toUpperCase();
+                        if (statusVal === 'PASS') dynamicScore = 95;
+                        else if (statusVal === 'WARN' || statusVal === 'WARNING') dynamicScore = 65;
+                        else if (statusVal === 'FAIL') dynamicScore = 20;
+                      } else if (verdictMatch) {
+                        const verdictVal = verdictMatch[1].toUpperCase();
+                        if (verdictVal === 'SUPPORTED') dynamicScore = 95;
+                        else if (verdictVal === 'UNVERIFIED') dynamicScore = 50;
+                        else if (verdictVal === 'CONTRADICTED') dynamicScore = 15;
+                      } else if (dynamicScore === undefined || dynamicScore === null) {
+                        dynamicScore = 85;
+                      }
 
-                      {executionResult.receipt && (
-                        <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/90 dark:to-purple-950/90 border border-indigo-200 dark:border-indigo-500/30 space-y-2.5">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 text-xs font-bold text-indigo-900 dark:text-indigo-300">
-                              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                              Ed25519 Cryptographic Receipt
-                            </div>
-                            <button
-                              onClick={() => {
-                                const docketClean = { ...executionResult.receipt.docket || executionResult.receipt };
-                                delete docketClean.signature;
-                                delete docketClean.signatureAlgorithm;
-                                handleVerifyReceipt(docketClean, executionResult.receipt.signature);
-                                window.location.hash = '#verifier';
-                              }}
-                              className="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold transition flex items-center gap-1 shadow"
-                            >
-                              <ShieldCheck className="w-3 h-3" />
-                              1-Click Verify
-                            </button>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-slate-600 dark:text-slate-400">
-                            <div>
-                              <span className="block text-slate-400 text-[10px]">Receipt ID:</span>
-                              <span className="text-slate-800 dark:text-slate-200 font-bold truncate block">
-                                {executionResult.receipt.receiptId || executionResult.receipt.receipt_id || 'rcpt_preview'}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="block text-slate-400 text-[10px]">Purpose:</span>
-                              <span className="text-indigo-700 dark:text-indigo-300 font-bold truncate block">
-                                {executionResult.receipt.purposeString || executionResult.receipt.purpose || 'galaxia:execution'}
-                              </span>
+                      return (
+                        <div className="space-y-5">
+                          <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-galaxy-900/90 border border-slate-200 dark:border-white/5">
+                            <ScoreGauge score={dynamicScore} nightMode={nightMode} />
+                            <div className="space-y-1">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-400">Quality Assessment</span>
+                              <h4 className="text-base font-bold font-heading text-slate-900 dark:text-white">
+                                {dynamicScore >= 80 ? 'Passed Quality & Security Checks' : dynamicScore >= 50 ? 'Moderate Issues or Warnings Found' : 'Noticeable Vulnerabilities or Bugs Found'}
+                              </h4>
+                              <p className="text-xs text-slate-500 dark:text-slate-400">
+                                Processed via Groq Engine • Model: {executionResult.modelUsed || 'openai/gpt-oss-120b'}
+                              </p>
                             </div>
                           </div>
+
+                          <div className="max-h-96 overflow-y-auto pr-2">
+                            <FormattedOutput
+                              content={outputText || JSON.stringify(executionResult, null, 2)}
+                              onCopy={copyToClipboard}
+                            />
+                          </div>
+
+                          {executionResult.receipt && (
+                            <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/90 dark:to-purple-950/90 border border-indigo-200 dark:border-indigo-500/30 space-y-2.5">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2 text-xs font-bold text-indigo-900 dark:text-indigo-300">
+                                  <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                  Ed25519 Cryptographic Receipt
+                                </div>
+                                <button
+                                  onClick={() => {
+                                    const docketClean = { ...executionResult.receipt.docket || executionResult.receipt };
+                                    delete docketClean.signature;
+                                    delete docketClean.signatureAlgorithm;
+                                    handleVerifyReceipt(docketClean, executionResult.receipt.signature);
+                                    window.location.hash = '#verifier';
+                                  }}
+                                  className="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold transition flex items-center gap-1 shadow"
+                                >
+                                  <ShieldCheck className="w-3 h-3" />
+                                  1-Click Verify
+                                </button>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-slate-600 dark:text-slate-400">
+                                <div>
+                                  <span className="block text-slate-400 text-[10px]">Receipt ID:</span>
+                                  <span className="text-slate-800 dark:text-slate-200 font-bold truncate block">
+                                    {executionResult.receipt.receiptId || executionResult.receipt.receipt_id || 'rcpt_preview'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="block text-slate-400 text-[10px]">Purpose:</span>
+                                  <span className="text-indigo-700 dark:text-indigo-300 font-bold truncate block">
+                                    {executionResult.receipt.purposeString || executionResult.receipt.purpose || 'galaxia:execution'}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
+                      );
+                    })()
                   )}
                 </div>
               </div>
