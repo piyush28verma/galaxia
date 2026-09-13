@@ -1,0 +1,29 @@
+# Secrets & Tokens (NEVER COMMIT)
+.env
+.member_token
+.ed25519_keys.json
+nothing/
+dist/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+node_modules/
+
+
+# macOS files
+.DS_Store
+
+# Competitor reference repos
+witness-master/
+yuzu-master/
+
+# Temporary files
+scratch/
+test_write.txt
