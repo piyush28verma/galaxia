@@ -42,12 +42,12 @@ const CAPABILITIES: Capability[] = [
   {
     id: 'lint',
     mode: 'lint',
-    label: 'Free Lint Tier',
-    tag: '0 Credits',
+    label: 'Code Linter',
+    tag: 'Free',
     icon: Sparkles,
     gradient: 'from-blue-500 to-indigo-500',
     badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/30',
-    description: 'Instant AST-level syntax sanity & security pattern check',
+    description: 'Instant syntax, type, and bug check',
     defaultPrompt: `def calculate_average(numbers):\n    total = sum(numbers)\n    return total / len(numbers)`
   },
   {
@@ -58,50 +58,50 @@ const CAPABILITIES: Capability[] = [
     icon: SearchCheck,
     gradient: 'from-pink-500 to-rose-500',
     badgeColor: 'bg-pink-500/10 text-pink-600 dark:text-pink-300 border-pink-500/30',
-    description: 'Deep logic scan, OWASP/CVE detection & refactored clean code',
+    description: 'Finds logic bugs, security risks & provides clean fixes',
     defaultPrompt: `query = f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'"\ndb.execute(query)`
   },
   {
     id: 'verify',
     mode: 'verify',
-    label: 'Grounded Fact-Check',
+    label: 'Fact Check & Verification',
     tag: '3 Credits',
     icon: Globe2,
     gradient: 'from-emerald-500 to-teal-500',
     badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border-emerald-500/30',
-    description: 'Live grounded claim verification with evidence & truth rating',
+    description: 'Web-grounded fact checking with sources & truth rating',
     defaultPrompt: `The James Webb Space Telescope operates at the Sun-Earth L2 Lagrange point approximately 1.5 million kilometers from Earth.`
   },
   {
     id: 'format',
     mode: 'format',
-    label: 'Schema Extraction',
+    label: 'JSON Converter',
     tag: '5 Credits',
     icon: Braces,
     gradient: 'from-purple-500 to-violet-500',
     badgeColor: 'bg-purple-500/10 text-purple-600 dark:text-purple-300 border-purple-500/30',
-    description: 'Transforms messy unstructured text into pristine JSON schema',
+    description: 'Converts unstructured text into clean JSON format',
     defaultPrompt: `Alex Johnson is Principal Architect at NeoCyber in Seattle, earning $210k. Specializes in Rust, Distributed Systems, and Raft Consensus.`
   },
   {
     id: 'ask',
     mode: 'ask',
-    label: 'Cognitive Strategist',
+    label: 'Problem Solver & Planning',
     tag: '5 Credits',
     icon: Bot,
     gradient: 'from-amber-500 to-orange-500',
     badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/30',
-    description: 'Comprehensive analysis, system design & step-by-step action plan',
-    defaultPrompt: `Design a high-throughput autonomous agent payment gateway on SharedOS with deny-by-default capability authorization and sub-second SLAs.`
+    description: 'Technical analysis, system design & step-by-step action plan',
+    defaultPrompt: `Design an autonomous payment system for AI agents with usage limits and sub-second response times.`
   }
 ];
 
 const PRESETS = [
-  { label: 'SQL Injection Vuln', capId: 'review', value: `def authenticate(user, pwd):\n    cursor.execute(f"SELECT * FROM accounts WHERE user = '{user}' AND pwd = '{pwd}'")\n    return cursor.fetchone()` },
-  { label: 'JWST Orbit Claim', capId: 'verify', value: `The James Webb Space Telescope is located at Sun-Earth L2 Lagrange point, 1.5M km from Earth.` },
-  { label: 'Profile Extraction', capId: 'format', value: `Dr. Elena Vance, Senior AI Scientist at Quantum Labs SF. Email: elena@quantum.io, Skills: PyTorch, CUDA, Transformers.` },
-  { label: 'Architect Agent Hub', capId: 'ask', value: `How can an agent dynamically negotiate pricing and execute bounded grants without hitting rate limits on SharedOS?` },
-  { label: 'Zero-Division Edge Case', capId: 'lint', value: `def get_mean(items):\n    return sum(items) / len(items)` }
+  { label: 'SQL Injection Check', capId: 'review', value: `def authenticate(user, pwd):\n    cursor.execute(f"SELECT * FROM accounts WHERE user = '{user}' AND pwd = '{pwd}'")\n    return cursor.fetchone()` },
+  { label: 'Fact Check Claim', capId: 'verify', value: `The James Webb Space Telescope is located at Sun-Earth L2 Lagrange point, 1.5M km from Earth.` },
+  { label: 'Extract Profile JSON', capId: 'format', value: `Dr. Elena Vance, Senior AI Scientist at Quantum Labs SF. Email: elena@quantum.io, Skills: PyTorch, CUDA, Transformers.` },
+  { label: 'System Design Plan', capId: 'ask', value: `How can an agent dynamically negotiate pricing and execute bounded grants without hitting rate limits on SharedOS?` },
+  { label: 'Division by Zero Check', capId: 'lint', value: `def get_mean(items):\n    return sum(items) / len(items)` }
 ];
 
 const PRINCIPAL_ID = "p_wXzmdHhSly";
@@ -263,6 +263,32 @@ export default function App() {
     }
   }, [nightMode]);
 
+  // Scroll Reveal Intersection Observer
+  useEffect(() => {
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    const observerCallback: IntersectionObserverCallback = (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, {
+      root: null,
+      rootMargin: '0px 0px -40px 0px',
+      threshold: 0.05
+    });
+
+    const elements = document.querySelectorAll('.scroll-reveal');
+    elements.forEach(el => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
   const fetchAudits = useCallback(async () => {
     try {
       const res = await fetch('/api/v1/audits?limit=12');
@@ -413,19 +439,19 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen pb-20">
-      {/* Background ambient stars */}
+    <div className="relative min-h-screen flex flex-col justify-between">
+      {/* Background ambient floating lights */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute top-20 left-[5%] w-2 h-2 rounded-full bg-pink-400/80 shadow-[0_0_15px_4px_rgba(236,72,153,0.5)] animate-float" />
-        <div className="absolute top-48 right-[8%] w-2.5 h-2.5 rounded-full bg-indigo-400/80 shadow-[0_0_20px_5px_rgba(129,140,248,0.5)] animate-float" />
-        <div className="absolute bottom-32 left-[12%] w-1.5 h-1.5 rounded-full bg-emerald-400/80 shadow-[0_0_15px_3px_rgba(16,185,129,0.5)] animate-float" />
+        <div className="absolute top-20 left-[5%] w-32 h-32 rounded-full bg-pink-500/10 blur-3xl animate-float" />
+        <div className="absolute top-48 right-[8%] w-48 h-48 rounded-full bg-indigo-500/10 blur-3xl animate-float" />
+        <div className="absolute bottom-32 left-[12%] w-40 h-40 rounded-full bg-emerald-500/10 blur-3xl animate-float" />
       </div>
 
       {/* Top Header */}
-      <header className="sticky top-0 z-50 px-4 sm:px-8 pt-4">
+      <header className="sticky top-0 z-50 w-full px-4 sm:px-8 pt-4 pb-2">
         <nav className="mx-auto max-w-7xl glass-nav rounded-2xl px-5 py-3.5 flex items-center justify-between gap-4">
-          <a href="#" className="flex items-center gap-3 group">
-            <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white shadow-lg shadow-pink-500/25 group-hover:scale-105 transition-transform">
+          <a href="#" className="flex items-center gap-3 group cursor-pointer">
+            <div className="animate-water-float relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white shadow-lg shadow-pink-500/25 group-hover:scale-110 transition-transform">
               <Sparkles className="w-5 h-5 animate-pulse" />
             </div>
             <div>
@@ -438,23 +464,23 @@ export default function App() {
           </a>
 
           <div className="hidden md:flex items-center gap-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
-            <a href="#playground" className="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition">Playground</a>
-            <a href="#live-stream" className="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition">Live Starlight</a>
+            <a href="#playground" className="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition">Try Tools</a>
+            <a href="#live-stream" className="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition">Live Activity</a>
             <a href="#grants-matrix" className="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1.5">
               <KeyRound className="w-3 h-3 text-pink-500" />
-              Grant Matrix
+              Permissions Matrix
             </a>
             <a href="#integrations" className="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition">MCP & API</a>
             <a href="#verifier" className="px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-              Ed25519 Verifier
+              Receipt Verifier
             </a>
           </div>
 
           <div className="flex items-center gap-2.5 sm:gap-3">
             <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-              SharedOS 0.1.0
+              SharedOS Ready
             </div>
 
             <button
@@ -462,7 +488,7 @@ export default function App() {
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-500/10 dark:bg-indigo-500/15 border border-indigo-500/30 text-indigo-700 dark:text-indigo-300 text-xs font-mono font-semibold hover:bg-indigo-500/20 transition"
             >
               {copiedKey === 'principal' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-              {`Principal: ${PRINCIPAL_ID}`}
+              {`Pay ID: ${PRINCIPAL_ID}`}
             </button>
 
             <button
@@ -484,9 +510,9 @@ export default function App() {
 
         {mobileMenuOpen && (
           <div className="md:hidden mt-2 glass-panel rounded-xl p-4 flex flex-col gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-            <a href="#playground" onClick={() => setMobileMenuOpen(false)} className="p-2 rounded hover:bg-slate-100 dark:hover:bg-white/10">Playground</a>
-            <a href="#live-stream" onClick={() => setMobileMenuOpen(false)} className="p-2 rounded hover:bg-slate-100 dark:hover:bg-white/10">Live Starlight</a>
-            <a href="#grants-matrix" onClick={() => setMobileMenuOpen(false)} className="p-2 rounded hover:bg-slate-100 dark:hover:bg-white/10">Grant Matrix</a>
+            <a href="#playground" onClick={() => setMobileMenuOpen(false)} className="p-2 rounded hover:bg-slate-100 dark:hover:bg-white/10">Try Tools</a>
+            <a href="#live-stream" onClick={() => setMobileMenuOpen(false)} className="p-2 rounded hover:bg-slate-100 dark:hover:bg-white/10">Live Activity</a>
+            <a href="#grants-matrix" onClick={() => setMobileMenuOpen(false)} className="p-2 rounded hover:bg-slate-100 dark:hover:bg-white/10">Permissions Matrix</a>
             <a href="#integrations" onClick={() => setMobileMenuOpen(false)} className="p-2 rounded hover:bg-slate-100 dark:hover:bg-white/10">MCP & API Docs</a>
             <a href="#verifier" onClick={() => setMobileMenuOpen(false)} className="p-2 rounded hover:bg-slate-100 dark:hover:bg-white/10">Receipt Verifier</a>
           </div>
@@ -494,35 +520,35 @@ export default function App() {
       </header>
 
       {/* Main Container */}
-      <main className="relative z-10 mx-auto max-w-7xl px-4 sm:px-8 pt-10 space-y-20">
+      <main className="relative z-10 flex-1 w-full mx-auto max-w-7xl px-4 sm:px-8 pt-10 space-y-24">
         {/* Hero */}
         <section className="text-center max-w-3xl mx-auto pt-6 space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-500/10 dark:bg-pink-500/20 border border-pink-500/30 text-pink-600 dark:text-pink-300 text-xs font-bold tracking-wide shadow-sm">
             <Zap className="w-3.5 h-3.5 text-pink-500" />
-            Groq LPU Inference • Sub-Second Latency (&lt; 1.0s) • Ed25519 Signed Proof
+            Fast AI Inference • Under 1 Second Response • Verified Proofs
           </div>
           <h1 className="text-4xl sm:text-6xl font-black font-heading tracking-tight leading-none text-slate-900 dark:text-white">
-            Autonomous Intelligence.
+            AI Tools for Agents.
             <span className="block mt-2 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 dark:from-pink-400 dark:via-purple-300 dark:to-indigo-400 bg-clip-text text-transparent">
-              Cryptographically Proven.
+              Fast, Verified & Accurate.
             </span>
           </h1>
           <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-            Galaxia powers agents across the SharedOS network with real-time static code analysis, AI-grounded fact checking, and deterministic security scoring. Every turn is sealed with an asymmetric Ed25519 receipt.
+            Galaxia provides tools for AI agents on the SharedOS network: automated code review, live web fact-checking, JSON conversion, and technical planning. Every result comes with a signed digital receipt.
           </p>
         </section>
 
         {/* 1. Playground */}
-        <section id="playground" className="scroll-mt-24">
-          <div className="glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl">
+        <section id="playground" className="scroll-reveal scroll-mt-24">
+          <div className="glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl transition-all duration-500">
             {/* Capabilities */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold font-heading text-slate-900 dark:text-white flex items-center gap-2">
                   <Orbit className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
-                  Select Intelligence Capability
+                  Choose a Service
                 </h2>
-                <span className="text-xs text-slate-500 dark:text-slate-400 font-mono font-medium">Deny-By-Default Enforced</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-mono font-medium">Automatic Usage Tracking</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 {CAPABILITIES.map(cap => {
@@ -538,7 +564,7 @@ export default function App() {
                       className={`p-4 rounded-2xl text-left transition-all duration-300 relative border ${
                         isSelected
                           ? 'bg-indigo-50 dark:bg-gradient-to-br dark:from-indigo-900/90 dark:to-purple-900/70 border-indigo-400 dark:border-indigo-400 shadow-lg shadow-indigo-500/15 scale-[1.02]'
-                          : 'glass-card hover:border-indigo-400/50 hover:bg-slate-50 dark:hover:bg-galaxy-850/80'
+                          : 'glass-card hover:border-indigo-400/50 hover:bg-slate-50 dark:hover:bg-galaxy-850/80 hover:-translate-y-1'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
@@ -566,7 +592,7 @@ export default function App() {
                 <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
                   <span className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
                     <Terminal className="w-3.5 h-3.5 text-pink-500" />
-                    Mission Payload Input
+                    Input Prompt or Code
                   </span>
                   <div className="flex items-center gap-2">
                     <label className="text-[11px]">Caller:</label>
@@ -595,7 +621,7 @@ export default function App() {
 
                 {/* Presets */}
                 <div className="space-y-2">
-                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Quick Presets:</span>
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Examples:</span>
                   <div className="flex flex-wrap gap-2">
                     {PRESETS.map((preset, pIdx) => (
                       <button
@@ -604,7 +630,7 @@ export default function App() {
                           setActiveCapId(preset.capId);
                           setInputVal(preset.value);
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-slate-200 dark:border-white/10 hover:border-indigo-400 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-indigo-700 dark:hover:text-white transition"
+                        className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-slate-200 dark:border-white/10 hover:border-indigo-400 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-indigo-700 dark:hover:text-white transition hover:-translate-y-0.5"
                       >
                         {preset.label}
                       </button>
@@ -619,7 +645,7 @@ export default function App() {
                   className="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 hover:from-pink-400 hover:to-indigo-500 text-white font-bold font-heading text-base shadow-xl shadow-pink-500/25 hover:shadow-pink-500/40 transition-all transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                 >
                   {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5 fill-current" />}
-                  {loading ? `Executing ${activeCap.label}... (${(elapsedMs / 1000).toFixed(2)}s)` : `Run Galaxia Tool (${activeCap.tag})`}
+                  {loading ? `Running ${activeCap.label}... (${(elapsedMs / 1000).toFixed(2)}s)` : `Run Service (${activeCap.tag})`}
                 </button>
               </div>
 
@@ -628,11 +654,11 @@ export default function App() {
                 <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
                   <span className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
-                    Verified Output & Proof
+                    Response & Verified Receipt
                   </span>
                   {executionResult && (
                     <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-mono text-[10px] font-bold">
-                      Latency: {executionResult.latencyMs || executionResult.latency_ms || elapsedMs}ms
+                      Response Time: {executionResult.latencyMs || executionResult.latency_ms || elapsedMs}ms
                     </span>
                   )}
                 </div>
@@ -648,16 +674,16 @@ export default function App() {
                       <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-white/5 mx-auto flex items-center justify-center text-slate-400 dark:text-slate-600">
                         <Orbit className="w-8 h-8 animate-spin-slow" />
                       </div>
-                      <p className="text-sm font-medium">Select a capability and ignite the engine to view verified results.</p>
+                      <p className="text-sm font-medium">Select a service above and click Run to test it live.</p>
                     </div>
                   ) : (
                     <div className="space-y-5">
                       <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-galaxy-900/90 border border-slate-200 dark:border-white/5">
                         <ScoreGauge score={executionResult.score ?? executionResult.deterministic_score ?? 85} nightMode={nightMode} />
                         <div className="space-y-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-400">Deterministic Evaluation</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-400">Quality Assessment</span>
                           <h4 className="text-base font-bold font-heading text-slate-900 dark:text-white">
-                            {(executionResult.score ?? 85) >= 80 ? 'Optimal Integrity & Logic Quality' : 'Noticeable Vulnerabilities / Edge-Cases'}
+                            {(executionResult.score ?? 85) >= 80 ? 'Passed Quality & Security Checks' : 'Noticeable Vulnerabilities or Issues Found'}
                           </h4>
                           <p className="text-xs text-slate-500 dark:text-slate-400">
                             Processed via Groq Engine • Model: {executionResult.modelUsed || 'LLaMA-3.3-70B-Versatile'}
@@ -717,25 +743,25 @@ export default function App() {
           </div>
         </section>
 
-        {/* 2. Live Starlight Stream */}
-        <section id="live-stream" className="scroll-mt-24 space-y-6">
+        {/* 2. Live Activity Stream */}
+        <section id="live-stream" className="scroll-reveal scroll-mt-24 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <div className="inline-flex items-center gap-2 text-xs font-bold text-pink-600 dark:text-pink-400 uppercase tracking-widest">
+              <div className="animate-water-float inline-flex items-center gap-2 text-xs font-bold text-pink-600 dark:text-pink-400 uppercase tracking-widest">
                 <Radio className="w-3.5 h-3.5 animate-pulse" />
                 Live Network Feed
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black font-heading text-slate-900 dark:text-white mt-1">Starlight Execution Stream</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Real-time telemetry of all capability executions authenticated by SharedOS.</p>
+              <h2 className="text-2xl sm:text-3xl font-black font-heading text-slate-900 dark:text-white mt-1">Live Activity Stream</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Live feed of requests processed and verified on SharedOS.</p>
             </div>
             <div className="flex items-center gap-3">
-              <div className={`px-3 py-1.5 rounded-full text-xs font-mono font-bold flex items-center gap-2 border ${
+              <div className={`animate-water-float px-3 py-1.5 rounded-full text-xs font-mono font-bold flex items-center gap-2 border ${
                 sseStatus === 'live'
                   ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400'
                   : 'bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-400'
               }`}>
                 <span className={`w-2 h-2 rounded-full ${sseStatus === 'live' ? 'bg-emerald-500 animate-ping' : 'bg-amber-500'}`} />
-                {sseStatus === 'live' ? 'SSE LIVE STREAM' : 'POLLING REFRESH'}
+                {sseStatus === 'live' ? 'LIVE STREAM' : 'POLLING REFRESH'}
               </div>
             </div>
           </div>
@@ -743,13 +769,13 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {audits.length === 0 ? (
               <div className="col-span-full text-center py-12 glass-panel rounded-2xl text-slate-500 text-sm">
-                Awaiting first live execution event from the arena...
+                Waiting for the first activity event from the room...
               </div>
             ) : (
               audits.map((audit, idx) => {
                 const receiptId = audit.receiptId || audit.receipt_id || `rcpt_${idx}`;
                 return (
-                  <div key={idx} className="glass-card rounded-2xl p-4 space-y-3">
+                  <div key={idx} className="glass-card rounded-2xl p-4 space-y-3 hover:-translate-y-1 transition-transform">
                     <div className="flex items-center justify-between text-xs">
                       <span className="px-2 py-0.5 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 font-bold uppercase text-[10px]">
                         {audit.mode || 'execute'}
@@ -766,7 +792,7 @@ export default function App() {
                       </span>
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-white/5 text-[11px] font-mono">
-                      <span className="text-slate-500 dark:text-slate-400">Latency: {audit.latencyMs || audit.latency || audit.latency_ms || 450}ms</span>
+                      <span className="text-slate-500 dark:text-slate-400">Time: {audit.latencyMs || audit.latency || audit.latency_ms || 450}ms</span>
                       <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-bold">
                         <ShieldCheck className="w-3 h-3" />
                         VERIFIED
@@ -782,16 +808,16 @@ export default function App() {
           </div>
         </section>
 
-        {/* 3. Grant Matrix */}
-        <section id="grants-matrix" className="scroll-mt-24 space-y-6">
+        {/* 3. Permissions Matrix */}
+        <section id="grants-matrix" className="scroll-reveal scroll-mt-24 space-y-6">
           <div>
             <div className="inline-flex items-center gap-2 text-xs font-bold text-pink-600 dark:text-pink-400 uppercase tracking-widest">
               <KeyRound className="w-3.5 h-3.5 text-pink-500" />
-              Judges' Architecture Review
+              Access & Metering
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black font-heading text-slate-900 dark:text-white mt-1">SharedOS Bounded Grant Matrix</h2>
+            <h2 className="text-2xl sm:text-3xl font-black font-heading text-slate-900 dark:text-white mt-1">SharedOS Permissions Matrix</h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 max-w-2xl">
-              Enforced by official CapabilityAuthorizer. Permissions act as the cryptographic payment primitive on SharedOS with deny-by-default metering.
+              Usage permissions enforced by SharedOS. Each service has clear credit limits and remaining capacity.
             </p>
           </div>
 
@@ -800,11 +826,11 @@ export default function App() {
               <table className="w-full text-left text-xs font-mono">
                 <thead className="bg-slate-100 dark:bg-galaxy-900/90 text-slate-700 dark:text-indigo-200 border-b border-slate-200 dark:border-indigo-500/20 text-[11px] uppercase tracking-wider">
                   <tr>
-                    <th className="p-4 font-bold">Capability ID</th>
-                    <th className="p-4 font-bold">Actor</th>
-                    <th className="p-4 font-bold">Resource Path</th>
+                    <th className="p-4 font-bold">Service ID</th>
+                    <th className="p-4 font-bold">Caller</th>
+                    <th className="p-4 font-bold">Endpoint</th>
                     <th className="p-4 font-bold">Action</th>
-                    <th className="p-4 font-bold">Purpose String</th>
+                    <th className="p-4 font-bold">Purpose Tag</th>
                     <th className="p-4 font-bold">Max Uses</th>
                     <th className="p-4 font-bold">Remaining</th>
                     <th className="p-4 font-bold">Status</th>
@@ -813,11 +839,11 @@ export default function App() {
                 <tbody className="divide-y divide-slate-200 dark:divide-white/5 text-slate-700 dark:text-slate-300">
                   {grantsLoading ? (
                     <tr>
-                      <td colSpan={8} className="p-8 text-center text-slate-500">Loading live SharedOS capabilities...</td>
+                      <td colSpan={8} className="p-8 text-center text-slate-500">Loading service permissions...</td>
                     </tr>
                   ) : grants.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="p-8 text-center text-slate-500">No bounded grants found.</td>
+                      <td colSpan={8} className="p-8 text-center text-slate-500">No permissions records found.</td>
                     </tr>
                   ) : (
                     grants.map((g, idx) => (
@@ -827,7 +853,7 @@ export default function App() {
                         <td className="p-4 text-slate-500 dark:text-slate-400">{g.resource_path || g.resource || '/api/v1/execute'}</td>
                         <td className="p-4">
                           <span className="px-2 py-0.5 rounded bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 text-[10px] font-bold">
-                            {g.action || 'EXECUTE'}
+                            {g.action || 'CALL'}
                           </span>
                         </td>
                         <td className="p-4 text-slate-600 dark:text-slate-400 max-w-xs truncate">{g.purpose_string || g.purpose || 'galaxia:inference'}</td>
@@ -849,14 +875,14 @@ export default function App() {
         </section>
 
         {/* 4. MCP & API Docs */}
-        <section id="integrations" className="scroll-mt-24 space-y-6">
+        <section id="integrations" className="scroll-reveal scroll-mt-24 space-y-6">
           <div>
             <div className="inline-flex items-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
               <Code2 className="w-3.5 h-3.5 text-indigo-500" />
-              Agent Interoperability
+              Developer Access
             </div>
             <h2 className="text-2xl sm:text-3xl font-black font-heading text-slate-900 dark:text-white mt-1">Connect Any Agent to Galaxia</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Direct integration via Model Context Protocol (MCP), REST API, or Arena chat commands.</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Direct access via Model Context Protocol (MCP), REST API, or Arena chat commands.</p>
           </div>
 
           <div className="glass-panel rounded-3xl overflow-hidden shadow-2xl">
@@ -901,9 +927,9 @@ export default function App() {
         </section>
 
         {/* 5. Cryptographic Receipt Verifier */}
-        <section id="verifier" className="scroll-mt-24 space-y-6 max-w-4xl mx-auto">
+        <section id="verifier" className="scroll-reveal scroll-mt-24 space-y-6 max-w-4xl mx-auto">
           <div className="text-center space-y-2">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-indigo-600 text-white mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <div className="animate-water-float w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-indigo-600 text-white mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/20">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <h2 className="text-2xl sm:text-3xl font-black font-heading text-slate-900 dark:text-white">Cryptographic Receipt Verifier</h2>
@@ -963,12 +989,34 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-24 border-t border-slate-200 dark:border-white/10 pt-8 pb-12 text-center text-xs text-slate-500 space-y-2">
+      <footer className="scroll-reveal w-full mt-16 border-t border-slate-200 dark:border-white/10 py-12 text-center text-xs text-slate-500 space-y-3">
         <div className="flex items-center justify-center gap-2 font-heading font-bold text-slate-700 dark:text-slate-300">
           <Sparkles className="w-4 h-4 text-pink-500" />
-          Galaxia Universal Intelligence Tool — Built for SharedOS 2026
+          Galaxia Universal Intelligence Tool Built for SharedOS
         </div>
-        <p>Zero Freeloader Vulnerability • Bounded Grant Metering • Sub-Second Groq LPU Execution</p>
+        <p className="text-slate-500 dark:text-slate-400">
+          Made by{' '}
+          <a
+            href="https://www.linkedin.com/in/shreya925/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-pink-500 dark:hover:text-pink-400 underline underline-offset-4 transition"
+          >
+            Shreya Chaudhary
+          </a>
+          {' '}&amp;{' '}
+          <a
+            href="https://www.linkedin.com/in/piyush-verma-2853b9319/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-pink-500 dark:hover:text-pink-400 underline underline-offset-4 transition"
+          >
+            Piyush Verma
+          </a>
+        </p>
+        <p className="text-[11px] text-slate-400 dark:text-slate-500">
+          Bounded Grant Metering • Sub-Second Groq Execution • Live Ed25519 Cryptographic Proofs
+        </p>
       </footer>
     </div>
   );
