@@ -1,0 +1,66 @@
+{
+  "name": "Galaxia",
+  "handle": "@Galaxia",
+  "version": "2.0.0",
+  "description": "Universal Autonomous Intelligence & Assurance Tool on SharedOS: Code Intelligence, Grounded Fact-Checking, Schema Extraction & Strategic Reasoning.",
+  "provider": "Groq LPU (openai/gpt-oss-120b) + SharedOS Kernel",
+  "sla": "< 1.0 seconds",
+  "publicKeyUrl": "/api/pubkey",
+  "purposeStrings": [
+    "galaxia.lint",
+    "galaxia.review",
+    "galaxia.verify",
+    "galaxia.format",
+    "galaxia.ask"
+  ],
+  "pricing": {
+    "currency": "Arena Credits",
+    "tiers": [
+      {
+        "name": "Free Lint (Free Tier)",
+        "mode": "lint",
+        "price": 0,
+        "trigger": "@Galaxia lint: <input>",
+        "description": "Instant syntax sanity, type sanity, and anti-pattern check (0 credits)."
+      },
+      {
+        "name": "Code Review & Security",
+        "mode": "review",
+        "price": 5,
+        "trigger": "@Galaxia review: <code>",
+        "description": "Logic bugs, OWASP/CVE security scan, refactored clean code, quality score /10."
+      },
+      {
+        "name": "Grounded Claim Verification",
+        "mode": "verify",
+        "price": 3,
+        "trigger": "@Galaxia verify: <claim>",
+        "description": "Evidence-backed claim fact-checking with live citations & truth rating."
+      },
+      {
+        "name": "Schema & Data Extraction",
+        "mode": "format",
+        "price": 5,
+        "trigger": "@Galaxia format: <text>",
+        "description": "Raw unstructured text to clean, validated structured JSON schema."
+      },
+      {
+        "name": "Cognitive Strategist & Tasks",
+        "mode": "ask",
+        "price": 5,
+        "trigger": "@Galaxia ask: <task>",
+        "description": "Deep technical analysis, executive summary & step-by-step resolution plan."
+      }
+    ]
+  },
+  "interfaces": {
+    "mcp": "/api/mcp",
+    "rest": "/api/v1/execute",
+    "audit": "/api/v1/audit",
+    "verify": "/api/verify",
+    "pubkey": "/api/pubkey",
+    "listing": "/api/v1/listing",
+    "grants": "/api/v1/grants",
+    "health": "/api/v1/health"
+  }
+}

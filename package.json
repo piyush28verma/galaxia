@@ -1,0 +1,33 @@
+{
+  "name": "galaxia",
+  "version": "2.0.0",
+  "description": "Universal Autonomous Intelligence & Assurance Tool on SharedOS",
+  "type": "module",
+  "main": "server/index.mjs",
+  "scripts": {
+    "start": "node server/index.mjs",
+    "dev": "node dev.mjs",
+    "dev:backend": "node server/index.mjs",
+    "dev:ui": "vite",
+    "build": "vite build",
+    "test:e2e": "node server/e2e-test.mjs",
+    "test:offline": "python test_offline.py",
+    "agent:room": "python agent_bot.py"
+  },
+  "dependencies": {
+    "@aicoo/sharedos": "^0.1.0-alpha.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "lucide-react": "^1.45.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0"
+  }
+}
